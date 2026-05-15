@@ -19,15 +19,14 @@ Import-Certificate -FilePath $CerFile.FullName `
     -CertStoreLocation "Cert:\LocalMachine\TrustedPeople" | Out-Null
 Write-Host "      Certyfikat zainstalowany." -ForegroundColor Green
 
-# 2. Instalacja MSIX
-$MsixFile = Get-ChildItem $ScriptDir -Filter "*.msix" -Recurse | Select-Object -First 1
-if ($null -eq $MsixFile) {
-    $MsixFile = Get-ChildItem $ScriptDir -Filter "*.msixbundle" -Recurse | Select-Object -First 1
-}
-if ($null -eq $MsixFile) { throw "Nie znaleziono pliku MSIX w $ScriptDir" }
+# 2. Instalacja przez .appinstaller (rejestruje zrodlo aktualizacji — wymagane do auto-update)
+$AppInstaller = Get-ChildItem $ScriptDir -Filter "*.appinstaller" | Select-Object -First 1
+if ($null -eq $AppInstaller) { throw "Nie znaleziono pliku .appinstaller w $ScriptDir" }
 
-Write-Host "[2/2] Instalacja aplikacji: $($MsixFile.Name)"
-Add-AppxPackage -Path $MsixFile.FullName -ForceApplicationShutdown
+Write-Host "[2/2] Instalacja aplikacji: $($AppInstaller.Name)"
+Write-Host "      Pobieranie pakietu z GitHub (wymagany internet)..."
+Add-AppxPackage -Path $AppInstaller.FullName -ForceApplicationShutdown
 Write-Host "      Instalacja zakonczona." -ForegroundColor Green
 
 Write-Host "`ndigiWORK SmartHUB zostal zainstalowany. Mozesz go uruchomic z menu Start." -ForegroundColor Cyan
+Write-Host "Auto-aktualizacje beda sprawdzane przy kazdym uruchomieniu aplikacji." -ForegroundColor Cyan

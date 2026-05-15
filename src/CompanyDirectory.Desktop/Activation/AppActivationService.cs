@@ -145,7 +145,7 @@ public class AppActivationService(
             if (info is null || string.IsNullOrEmpty(info.Version)) return;
 
             var remote = Version.Parse(info.Version);
-            var local  = Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(0, 0);
+            var local  = GetInstalledVersion();
             if (remote > local)
             {
                 logger.LogInformation("Update available: {Remote} (local: {Local})", remote, local);
@@ -155,6 +155,19 @@ public class AppActivationService(
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Update check failed");
+        }
+    }
+
+    private static Version GetInstalledVersion()
+    {
+        try
+        {
+            var v = Windows.ApplicationModel.Package.Current.Id.Version;
+            return new Version(v.Major, v.Minor, v.Build, v.Revision);
+        }
+        catch
+        {
+            return Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(0, 0);
         }
     }
 

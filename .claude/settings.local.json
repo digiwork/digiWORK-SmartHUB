@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-Content \"C:\\\\Users\\\\woj.blauciak\\\\.claude\\\\projects\\\\d--Projekt-Visual-Studio-CompanyDirectory\\\\b8c855af-311c-41e0-bd04-2ea786683e32.jsonl\" | Select-Object -Last 3 | ForEach-Object { $_ | ConvertFrom-Json | Select-Object -ExpandProperty message } | Where-Object { $_.role -eq \"user\" -or $_.role -eq \"assistant\" } | ForEach-Object { Write-Output \"--- ROLA: $\\($_.role\\) ---\"; $_.content | ForEach-Object { if \\($_.type -eq \"text\"\\) { Write-Output $_.text } } })",
+      "Bash(Get-ChildItem -Path \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\" -Recurse -Filter \"*.csproj\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(dotnet build *)",
+      "WebFetch(domain:www.smsapi.pl)",
+      "Bash(Test-Path \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\src\\\\CompanyDirectory.Api\\\\appsettings.Production.json\")",
+      "Bash(Get-ChildItem -Path \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\CompanyDirectory.Desktop\" -Recurse -Filter \"*Navigation*\" -File)",
+      "Bash(ls -la \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\\" 2>&1 | head -20)",
+      "Read(//d/Projekt Visual Studio/**)",
+      "Bash(Remove-Item \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\src\\\\CompanyDirectory.Desktop\\\\Views\\\\SearchWindow.xaml\", \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\src\\\\CompanyDirectory.Desktop\\\\Views\\\\SearchWindow.xaml.cs\", \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\src\\\\CompanyDirectory.Desktop\\\\Views\\\\ChatWindow.xaml\", \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\src\\\\CompanyDirectory.Desktop\\\\Views\\\\ChatWindow.xaml.cs\", \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\src\\\\CompanyDirectory.Desktop\\\\Views\\\\SettingsWindow.xaml\", \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\src\\\\CompanyDirectory.Desktop\\\\Views\\\\SettingsWindow.xaml.cs\", \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\src\\\\CompanyDirectory.Desktop\\\\Views\\\\InboxWindow.xaml\", \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\src\\\\CompanyDirectory.Desktop\\\\Views\\\\InboxWindow.xaml.cs\", \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\src\\\\CompanyDirectory.Desktop\\\\Views\\\\SentMessagesWindow.xaml\", \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\src\\\\CompanyDirectory.Desktop\\\\Views\\\\SentMessagesWindow.xaml.cs\", \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\src\\\\CompanyDirectory.Desktop\\\\Views\\\\SmsWindow.xaml\", \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\src\\\\CompanyDirectory.Desktop\\\\Views\\\\SmsWindow.xaml.cs\")",
+      "PowerShell(cd \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\\\\src\\\\CompanyDirectory.Desktop\" && dotnet add package Microsoft.Identity.Client.Desktop; Write-Host \"Exit: $LASTEXITCODE\")",
+      "Bash(Get-Content -Path 'C:\\\\Users\\\\woj.blauciak\\\\.claude\\\\projects\\\\d--Projekt-Visual-Studio-CompanyDirectory\\\\eef19401-af45-487f-99ac-61e7eb2e21d0.jsonl' -TotalCount 520)",
+      "Bash(Select-Object -Last 20)",
+      "Bash(gh --version)",
+      "PowerShell(gh --version 2>&1)",
+      "PowerShell(winget install GitHub.cli --accept-package-agreements --accept-source-agreements)",
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); gh auth login --web --hostname github.com)",
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); Get-ChildItem \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\" -Depth 1 | Select-Object Name, PSIsContainer)",
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); Set-Location \"d:\\\\Projekt Visual Studio\\\\CompanyDirectory\"; git init && git add . && git commit -m \"Initial commit — CompanyDirectory \\(WinUI 3 + ASP.NET Core API\\)\")"
+    ]
+  }
+}

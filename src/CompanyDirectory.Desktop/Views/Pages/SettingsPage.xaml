@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="CompanyDirectory_Desktop.Views.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Padding="20" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"    />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Text="Ustawienia"
+            Style="{StaticResource TitleTextBlockStyle}" />
+
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Spacing="16">
+
+                <!-- ── System ──────────────────────────────────────────── -->
+                <TextBlock Text="System"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Uruchamiaj przy starcie Windows"
+                                   Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="Aplikacja uruchomi się automatycznie po zalogowaniu."
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1"
+                                  IsOn="{x:Bind ViewModel.IsAutostartEnabled, Mode=TwoWay}"
+                                  OnContent="" OffContent=""
+                                  VerticalAlignment="Center" />
+                </Grid>
+
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Uruchom zminimalizowany do tray"
+                                   Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="Okno aplikacji będzie ukryte po starcie."
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1"
+                                  IsOn="{x:Bind ViewModel.StartMinimizedToTray, Mode=TwoWay}"
+                                  OnContent="" OffContent=""
+                                  VerticalAlignment="Center" />
+                </Grid>
+
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Zamknięcie okna chowa do tray"
+                                   Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="Przycisk X ukrywa okno zamiast kończyć aplikację."
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1"
+                                  IsOn="{x:Bind ViewModel.CloseToTray, Mode=TwoWay}"
+                                  OnContent="" OffContent=""
+                                  VerticalAlignment="Center" />
+                </Grid>
+
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Pokaż kartę pracowniczą"
+                                   Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="Wyświetla numer karty pracowniczej w panelu szczegółów."
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="1"
+                                  IsOn="{x:Bind ViewModel.ShowEmployeeCard, Mode=TwoWay}"
+                                  OnContent="" OffContent=""
+                                  VerticalAlignment="Center" />
+                </Grid>
+
+                <Border Height="1" Background="{ThemeResource SystemFillColorNeutralBrush}" />
+
+                <!-- ── Skrót klawiszowy ────────────────────────────────── -->
+                <TextBlock Text="Skrót klawiszowy (zmiana wymaga restartu)"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                <Grid ColumnSpacing="12" RowSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160" />
+                        <ColumnDefinition Width="*"   />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Modyfikatory:" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="1"
+                             Text="{x:Bind ViewModel.HotkeyModifiers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             PlaceholderText="np. Control,Alt" />
+
+                    <TextBlock Grid.Row="1" Text="Klawisz:" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="1" Grid.Column="1"
+                             Text="{x:Bind ViewModel.HotkeyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             PlaceholderText="np. Space, F1, Q" />
+                </Grid>
+
+                <Border Height="1" Background="{ThemeResource SystemFillColorNeutralBrush}" />
+
+                <!-- ── Synchronizacja ─────────────────────────────────── -->
+                <TextBlock Text="Synchronizacja (zmiana wymaga restartu)"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                <Grid ColumnSpacing="12" RowSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160" />
+                        <ColumnDefinition Width="*"   />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Interwał (minuty):" VerticalAlignment="Center" />
+                    <NumberBox Grid.Column="1"
+                               Value="{x:Bind ViewModel.SyncIntervalMinutes, Mode=TwoWay}"
+                               Minimum="5" Maximum="1440" SpinButtonPlacementMode="Inline" />
+
+                    <TextBlock Grid.Row="1" Text="URL API:" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="1" Grid.Column="1"
+                             Text="{x:Bind ViewModel.ApiBaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             PlaceholderText="https://..." />
+                </Grid>
+
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" Spacing="2">
+                        <TextBlock Text="Synchronizuj teraz"
+                                   Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="{x:Bind ViewModel.SyncStatus, Mode=OneWay}"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <ProgressRing IsActive="{x:Bind ViewModel.IsSyncing, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.IsSyncing, Mode=OneWay}"
+                                      Width="20" Height="20" />
+                        <Button Content="Synchronizuj"
+                                Command="{x:Bind ViewModel.SyncNowCommand}" />
+                    </StackPanel>
+                </Grid>
+
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" Spacing="2">
+                        <TextBlock Text="Wyczyść cache i synchronizuj ponownie"
+                                   Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="Usuwa całą lokalną bazę i pobiera dane od nowa z AD. Użyj gdy dane są nieaktualne lub błędne."
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Content="Wyczyść i synchronizuj"
+                            Command="{x:Bind ViewModel.ClearAndSyncCommand}"
+                            VerticalAlignment="Center" />
+                </Grid>
+
+                <Border Height="1" Background="{ThemeResource SystemFillColorNeutralBrush}" />
+
+                <!-- ── Diagnostyka ────────────────────────────────────── -->
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Diagnostyka"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               VerticalAlignment="Center" />
+                    <Button Grid.Column="1"
+                            Content="Odśwież"
+                            Command="{x:Bind ViewModel.RefreshDiagnosticsCommand}"
+                            Padding="8,4" MinWidth="0" />
+                </Grid>
+
+                <Grid ColumnSpacing="12" RowSpacing="6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Wersja aplikacji:" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1"
+                               Text="{x:Bind ViewModel.AppVersion, Mode=OneWay}"
+                               FontFamily="Consolas" />
+
+                    <TextBlock Grid.Row="1" Text="Status SignalR:" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Grid.Column="1"
+                               Text="{x:Bind ViewModel.SignalRStatus, Mode=OneWay}" />
+
+                    <TextBlock Grid.Row="2" Text="Baza danych:" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="2" Grid.Column="1"
+                               Text="{x:Bind ViewModel.DatabasePath, Mode=OneWay}"
+                               TextTrimming="CharacterEllipsis"
+                               ToolTipService.ToolTip="{x:Bind ViewModel.DatabasePath, Mode=OneWay}"
+                               FontFamily="Consolas" FontSize="11" />
+
+                    <TextBlock Grid.Row="3" Text="Ostatnia synchronizacja:" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="3" Grid.Column="1"
+                               Text="{x:Bind ViewModel.LastSyncTime, Mode=OneWay}"
+                               FontFamily="Consolas" />
+
+                    <TextBlock Grid.Row="4" Text="Użytkownicy w cache:" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="4" Grid.Column="1"
+                               Text="{x:Bind ViewModel.UserCount, Mode=OneWay}"
+                               FontFamily="Consolas" />
+                </Grid>
+
+                <Button Content="Otwórz folder logów"
+                        Command="{x:Bind ViewModel.OpenLogsFolderCommand}" />
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Przyciski Zapisz / Anuluj -->
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="8">
+            <Button Content="Anuluj"
+                    Command="{x:Bind ViewModel.CancelCommand}" />
+            <Button Content="Zapisz"
+                    Command="{x:Bind ViewModel.SaveCommand}"
+                    Style="{StaticResource AccentButtonStyle}" />
+        </StackPanel>
+    </Grid>
+</Page>

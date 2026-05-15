@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="CompanyDirectory_Desktop.Views.Pages.InboxPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:dtos="using:CompanyDirectory.Shared.Dtos"
+    mc:Ignorable="d">
+
+    <TabView
+        IsAddTabButtonVisible="False"
+        TabWidthMode="Equal">
+
+        <!-- ── Tab: Odebrane ──────────────────────────────────────── -->
+        <TabViewItem Header="Odebrane" IsClosable="False">
+            <Grid Padding="12" RowSpacing="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*"    />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Text="Skrzynka odebrana"
+                        Style="{StaticResource TitleTextBlockStyle}"
+                        VerticalAlignment="Center" />
+                    <ProgressRing
+                        Grid.Column="1"
+                        IsActive="{x:Bind InboxVm.IsBusy, Mode=OneWay}"
+                        Width="20" Height="20" VerticalAlignment="Center" />
+                    <Button
+                        Grid.Column="2"
+                        Content="Odśwież"
+                        Command="{x:Bind InboxVm.LoadCommand}"
+                        VerticalAlignment="Center" />
+                </Grid>
+
+                <Grid Grid.Row="1" ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300" MinWidth="200" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <ListView
+                        ItemsSource="{x:Bind InboxVm.Messages, Mode=OneWay}"
+                        SelectedItem="{x:Bind InboxVm.SelectedMessage, Mode=TwoWay}"
+                        SelectionMode="Single">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="dtos:MessageDto">
+                                <StackPanel Padding="4,6" Spacing="2">
+                                    <TextBlock
+                                        Text="{x:Bind Title}"
+                                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                                        TextTrimming="CharacterEllipsis" />
+                                    <TextBlock
+                                        Text="{x:Bind AuthorDisplayName}"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <ScrollViewer
+                        Grid.Column="1"
+                        Visibility="{x:Bind InboxVm.DetailsVisibility, Mode=OneWay}">
+                        <StackPanel Spacing="12" Padding="4">
+                            <TextBlock
+                                Text="{x:Bind InboxVm.SelectedMessage.Title, Mode=OneWay}"
+                                Style="{StaticResource TitleTextBlockStyle}"
+                                TextWrapping="Wrap" />
+                            <Grid ColumnSpacing="8" RowSpacing="4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Nadawca:"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{x:Bind InboxVm.SelectedMessage.AuthorDisplayName, Mode=OneWay}" />
+                                <TextBlock Grid.Row="1" Text="Data:"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Grid.Row="1" Grid.Column="1"
+                                           Text="{x:Bind InboxVm.SelectedMessage.CreatedAt, Mode=OneWay}" />
+                            </Grid>
+                            <Border Height="1" Background="{ThemeResource SystemFillColorNeutralBrush}" />
+                            <TextBlock
+                                Text="{x:Bind InboxVm.SelectedMessage.Body, Mode=OneWay}"
+                                TextWrapping="Wrap"
+                                Style="{StaticResource BodyTextBlockStyle}" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+
+                <TextBlock
+                    Grid.Row="2"
+                    Text="{x:Bind InboxVm.StatusMessage, Mode=OneWay}"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </Grid>
+        </TabViewItem>
+
+        <!-- ── Tab: Wysłane ───────────────────────────────────────── -->
+        <TabViewItem Header="Wysłane" IsClosable="False">
+            <Grid Padding="12" RowSpacing="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*"    />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Text="Historia wysłanych wiadomości"
+                        Style="{StaticResource TitleTextBlockStyle}"
+                        VerticalAlignment="Center" />
+                    <ProgressRing
+                        Grid.Column="1"
+                        IsActive="{x:Bind SentVm.IsBusy, Mode=OneWay}"
+                        Width="20" Height="20" VerticalAlignment="Center" />
+                    <Button
+                        Grid.Column="2"
+                        Content="Odśwież"
+                        Command="{x:Bind SentVm.LoadCommand}"
+                        VerticalAlignment="Center" />
+                </Grid>
+
+                <Grid Grid.Row="1" ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300" MinWidth="200" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <ListView
+                        ItemsSource="{x:Bind SentVm.Messages, Mode=OneWay}"
+                        SelectedItem="{x:Bind SentVm.SelectedMessage, Mode=TwoWay}"
+                        SelectionMode="Single">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="dtos:MessageDto">
+                                <StackPanel Padding="4,6" Spacing="2">
+                                    <TextBlock
+                                        Text="{x:Bind Title}"
+                                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                                        TextTrimming="CharacterEllipsis" />
+                                    <Grid ColumnSpacing="6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            Text="{x:Bind AuthorDisplayName}"
+                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            TextTrimming="CharacterEllipsis" />
+                                        <FontIcon
+                                            Grid.Column="1"
+                                            Glyph="&#xE8BD;"
+                                            FontFamily="Segoe MDL2 Assets"
+                                            FontSize="10"
+                                            Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                                            Visibility="{x:Bind RequiresConfirmation}" />
+                                    </Grid>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <ScrollViewer
+                        Grid.Column="1"
+                        Visibility="{x:Bind SentVm.DetailsVisibility, Mode=OneWay}">
+                        <StackPanel Spacing="12" Padding="4">
+                            <TextBlock
+                                Text="{x:Bind SentVm.SelectedMessage.Title, Mode=OneWay}"
+                                Style="{StaticResource TitleTextBlockStyle}"
+                                TextWrapping="Wrap" />
+                            <Grid ColumnSpacing="8" RowSpacing="4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Nadawca:"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{x:Bind SentVm.SelectedMessage.AuthorDisplayName, Mode=OneWay}" />
+                                <TextBlock Grid.Row="1" Text="Data:"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Grid.Row="1" Grid.Column="1"
+                                           Text="{x:Bind SentVm.SelectedMessage.CreatedAt, Mode=OneWay}" />
+                                <TextBlock Grid.Row="2" Text="Potwierdzenie:"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Grid.Row="2" Grid.Column="1"
+                                           Text="{x:Bind SentVm.SelectedMessage.RequiresConfirmation, Mode=OneWay}" />
+                            </Grid>
+                            <Border Height="1" Background="{ThemeResource SystemFillColorNeutralBrush}" />
+                            <TextBlock
+                                Text="{x:Bind SentVm.SelectedMessage.Body, Mode=OneWay}"
+                                TextWrapping="Wrap"
+                                Style="{StaticResource BodyTextBlockStyle}" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+
+                <TextBlock
+                    Grid.Row="2"
+                    Text="{x:Bind SentVm.StatusMessage, Mode=OneWay}"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </Grid>
+        </TabViewItem>
+
+    </TabView>
+</Page>

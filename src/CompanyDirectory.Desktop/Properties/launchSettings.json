@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "CompanyDirectory.Desktop (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "CompanyDirectory.Desktop (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

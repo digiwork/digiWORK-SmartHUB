@@ -1,0 +1,26 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/src/">
+    <Project Path="src/CompanyDirectory.Api/CompanyDirectory.Api.csproj">
+      <Platform Solution="*|x86" Project="x86" />
+    </Project>
+    <Project Path="src/CompanyDirectory.Desktop/CompanyDirectory.Desktop.csproj">
+      <Platform Project="x86" />
+      <Deploy Solution="*|x86" />
+    </Project>
+    <Project Path="src/CompanyDirectory.Infrastructure/CompanyDirectory.Infrastructure.csproj">
+      <Platform Solution="*|x86" Project="x86" />
+    </Project>
+    <Project Path="src/CompanyDirectory.Shared/CompanyDirectory.Shared.csproj">
+      <Platform Solution="*|x86" Project="x86" />
+    </Project>
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CompanyDirectory.Tests/CompanyDirectory.Tests.csproj">
+      <Platform Solution="*|x86" Project="x86" />
+    </Project>
+  </Folder>
+</Solution>

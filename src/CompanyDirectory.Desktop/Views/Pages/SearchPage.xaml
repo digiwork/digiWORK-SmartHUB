@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="CompanyDirectory_Desktop.Views.Pages.SearchPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:dtos="using:CompanyDirectory.Shared.Dtos"
+    xmlns:converters="using:CompanyDirectory_Desktop.Converters"
+    mc:Ignorable="d">
+
+    <Grid RowSpacing="6" Padding="12">
+        <Grid.Resources>
+            <converters:Base64ToImageSourceConverter x:Key="Base64ToImageSource"/>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"    />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- ── Pasek wyszukiwania ─────────────────────────────────── -->
+        <Grid Grid.Row="0" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBox
+                x:Name="SearchTextBox"
+                Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                PlaceholderText="Szukaj pracownika (imię, nazwisko, login, e-mail)…"
+                VerticalAlignment="Center"
+                FontSize="15"
+                KeyDown="OnSearchTextBoxKeyDown" />
+
+            <ProgressRing
+                Grid.Column="1"
+                IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
+                Width="24" Height="24" />
+
+            <Button
+                Grid.Column="2"
+                x:Name="ExportButton"
+                Click="OnExportButtonClick"
+                ToolTipService.ToolTip="Eksportuj do CSV"
+                VerticalAlignment="Center"
+                Padding="8,6"
+                MinWidth="0">
+                <FontIcon Glyph="&#xE74E;" FontFamily="Segoe MDL2 Assets" FontSize="14" />
+            </Button>
+        </Grid>
+
+        <!-- ── Lista wyników + panel szczegółów ─────────────────── -->
+        <Grid Grid.Row="1" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="340" MinWidth="240" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Lista wyników -->
+            <Grid RowSpacing="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock
+                    Text="{x:Bind ViewModel.SectionLabel, Mode=OneWay}"
+                    Visibility="{x:Bind ViewModel.ShowSectionLabel, Mode=OneWay}"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Margin="4,0,0,2" />
+
+                <ListView
+                    Grid.Row="1"
+                    x:Name="ResultsListView"
+                    ItemsSource="{x:Bind ViewModel.Results, Mode=OneWay}"
+                    SelectedItem="{x:Bind ViewModel.SelectedUser, Mode=TwoWay}"
+                    SelectionMode="Single"
+                    KeyDown="OnResultsListViewKeyDown">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="dtos:UserDirectoryEntryDto">
+                            <Grid Padding="4,6" ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="36" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <PersonPicture
+                                    DisplayName="{x:Bind DisplayName}"
+                                    ProfilePicture="{Binding PhotoBase64, Converter={StaticResource Base64ToImageSource}}"
+                                    Width="36" Height="36" />
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                                    <TextBlock
+                                        Text="{x:Bind DisplayName}"
+                                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                                        TextTrimming="CharacterEllipsis" />
+                                    <TextBlock
+                                        Text="{x:Bind JobTitle}"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        TextTrimming="CharacterEllipsis" />
+                                    <TextBlock
+                                        Text="{x:Bind Department}"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                        TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+
+                                <!-- Szybkie akcje -->
+                                <StackPanel Grid.Column="2"
+                                            Orientation="Horizontal"
+                                            Spacing="2"
+                                            VerticalAlignment="Center">
+                                    <Button Tag="{x:Bind}"
+                                            Click="OnCardFavoriteClick"
+                                            ToolTipService.ToolTip="Ulubiony"
+                                            Padding="5" MinWidth="0"
+                                            Style="{StaticResource SubtleButtonStyle}">
+                                        <FontIcon Glyph="&#xE734;" FontFamily="Segoe MDL2 Assets" FontSize="12" Foreground="#FFB900"/>
+                                    </Button>
+                                    <Button Tag="{x:Bind}"
+                                            Click="OnCardChatClick"
+                                            ToolTipService.ToolTip="Czat"
+                                            Padding="5" MinWidth="0"
+                                            Style="{StaticResource SubtleButtonStyle}">
+                                        <FontIcon Glyph="&#xE8BD;" FontFamily="Segoe MDL2 Assets" FontSize="12" Foreground="#498205"/>
+                                    </Button>
+                                    <Button Tag="{x:Bind}"
+                                            Click="OnCardSmsClick"
+                                            ToolTipService.ToolTip="SMS"
+                                            Padding="5" MinWidth="0"
+                                            Style="{StaticResource SubtleButtonStyle}">
+                                        <FontIcon Glyph="&#xE8D4;" FontFamily="Segoe MDL2 Assets" FontSize="12" Foreground="#038387"/>
+                                    </Button>
+                                    <Button Tag="{x:Bind}"
+                                            Click="OnCardEmailClick"
+                                            ToolTipService.ToolTip="E-mail"
+                                            Padding="5" MinWidth="0"
+                                            Style="{StaticResource SubtleButtonStyle}">
+                                        <FontIcon Glyph="&#xE715;" FontFamily="Segoe MDL2 Assets" FontSize="12" Foreground="#0078D4"/>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+
+            <!-- Panel szczegółów -->
+            <ScrollViewer
+                Grid.Column="1"
+                Visibility="{x:Bind ViewModel.DetailsVisibility, Mode=OneWay}">
+                <StackPanel Spacing="8" Padding="4">
+
+                    <!-- Nagłówek -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <PersonPicture
+                                DisplayName="{x:Bind ViewModel.SelectedUser.DisplayName, Mode=OneWay}"
+                                ProfilePicture="{x:Bind ViewModel.SelectedUserPhoto, Mode=OneWay}"
+                                Width="56" Height="56" />
+                            <StackPanel VerticalAlignment="Center" Spacing="2">
+                                <TextBlock
+                                    Text="{x:Bind ViewModel.SelectedUser.DisplayName, Mode=OneWay}"
+                                    Style="{StaticResource TitleTextBlockStyle}" />
+                                <TextBlock
+                                    Text="{x:Bind ViewModel.SelectedUser.JobTitle, Mode=OneWay}"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Top">
+                            <Button
+                                x:Name="ChatButton"
+                                Click="OnChatButtonClick"
+                                ToolTipService.ToolTip="Otwórz czat"
+                                Padding="8" MinWidth="0">
+                                <FontIcon Glyph="&#xE8BD;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="#498205"/>
+                            </Button>
+                            <Button
+                                Command="{x:Bind ViewModel.ToggleFavoriteCommand}"
+                                ToolTipService.ToolTip="{x:Bind ViewModel.FavoriteButtonTooltip, Mode=OneWay}"
+                                Padding="8" MinWidth="0">
+                                <FontIcon
+                                    Glyph="{x:Bind ViewModel.FavoriteGlyph, Mode=OneWay}"
+                                    FontFamily="Segoe MDL2 Assets"
+                                    FontSize="16"
+                                    Foreground="#FFB900"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Height="1" Background="{ThemeResource SystemFillColorNeutralBrush}" Margin="0,4" />
+
+                    <!-- Pola kontaktowe -->
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Kontakt" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                        <Grid ColumnSpacing="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="E-mail:" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{x:Bind ViewModel.SelectedUser.Email, Mode=OneWay}"
+                                       TextTrimming="CharacterEllipsis"
+                                       VerticalAlignment="Center" />
+                            <Button Grid.Column="2"
+                                    Command="{x:Bind ViewModel.CopyToClipboardCommand}"
+                                    CommandParameter="{x:Bind ViewModel.SelectedUser.Email, Mode=OneWay}"
+                                    ToolTipService.ToolTip="Skopiuj e-mail"
+                                    Padding="6,4" MinWidth="0">
+                                <SymbolIcon Symbol="Copy" />
+                            </Button>
+                        </Grid>
+
+                        <Grid ColumnSpacing="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Telefon:" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{x:Bind ViewModel.SelectedUser.Phone, Mode=OneWay}"
+                                       VerticalAlignment="Center" />
+                            <Button Grid.Column="2"
+                                    Command="{x:Bind ViewModel.CopyToClipboardCommand}"
+                                    CommandParameter="{x:Bind ViewModel.SelectedUser.Phone, Mode=OneWay}"
+                                    ToolTipService.ToolTip="Skopiuj telefon"
+                                    Padding="6,4" MinWidth="0">
+                                <SymbolIcon Symbol="Copy" />
+                            </Button>
+                        </Grid>
+
+                        <Grid ColumnSpacing="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Komórka:" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{x:Bind ViewModel.SelectedUser.Mobile, Mode=OneWay}"
+                                       VerticalAlignment="Center" />
+                            <Button Grid.Column="2"
+                                    Command="{x:Bind ViewModel.CopyToClipboardCommand}"
+                                    CommandParameter="{x:Bind ViewModel.SelectedUser.Mobile, Mode=OneWay}"
+                                    ToolTipService.ToolTip="Skopiuj komórkę"
+                                    Padding="6,4" MinWidth="0">
+                                <SymbolIcon Symbol="Copy" />
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <Border Height="1" Background="{ThemeResource SystemFillColorNeutralBrush}" Margin="0,4" />
+
+                    <!-- Pola organizacyjne -->
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Organizacja" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                        <Grid ColumnSpacing="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Dział:" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{x:Bind ViewModel.SelectedUser.Department, Mode=OneWay}" />
+                        </Grid>
+
+                        <Grid ColumnSpacing="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Firma:" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{x:Bind ViewModel.SelectedUser.Company, Mode=OneWay}" />
+                        </Grid>
+
+                        <Grid ColumnSpacing="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Biuro:" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{x:Bind ViewModel.SelectedUser.Office, Mode=OneWay}" />
+                        </Grid>
+
+                        <Grid ColumnSpacing="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Przełożony:" VerticalAlignment="Center" />
+                            <HyperlinkButton Grid.Column="1"
+                                             Content="{x:Bind ViewModel.SelectedUser.ManagerDisplayName, Mode=OneWay}"
+                                             Command="{x:Bind ViewModel.NavigateToManagerCommand}"
+                                             Padding="0,0,0,2"
+                                             FontSize="14" />
+                        </Grid>
+
+                        <Grid ColumnSpacing="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Login:" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{x:Bind ViewModel.SelectedUser.Login, Mode=OneWay}"
+                                       FontFamily="Consolas"
+                                       VerticalAlignment="Center" />
+                            <Button Grid.Column="2"
+                                    Command="{x:Bind ViewModel.CopyToClipboardCommand}"
+                                    CommandParameter="{x:Bind ViewModel.SelectedUser.Login, Mode=OneWay}"
+                                    ToolTipService.ToolTip="Skopiuj login"
+                                    Padding="6,4" MinWidth="0">
+                                <SymbolIcon Symbol="Copy" />
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Karta pracownicza -->
+                    <Border Height="1" Background="{ThemeResource SystemFillColorNeutralBrush}" Margin="0,4"
+                            Visibility="{x:Bind ViewModel.CardSectionVisibility, Mode=OneWay}" />
+
+                    <StackPanel Spacing="4"
+                                Visibility="{x:Bind ViewModel.CardSectionVisibility, Mode=OneWay}">
+                        <TextBlock Text="Karta pracownicza" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                        <Grid ColumnSpacing="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Nr karty:" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{x:Bind ViewModel.FormattedEmployeeId, Mode=OneWay}"
+                                       FontFamily="Consolas"
+                                       VerticalAlignment="Center" />
+                            <Button Grid.Column="2"
+                                    Command="{x:Bind ViewModel.CopyToClipboardCommand}"
+                                    CommandParameter="{x:Bind ViewModel.FormattedEmployeeId, Mode=OneWay}"
+                                    ToolTipService.ToolTip="Skopiuj numer karty"
+                                    Padding="6,4" MinWidth="0">
+                                <SymbolIcon Symbol="Copy" />
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Sekcja IT -->
+                    <Border Height="1" Background="{ThemeResource SystemFillColorNeutralBrush}" Margin="0,4"
+                            Visibility="{x:Bind ViewModel.ItSectionVisibility, Mode=OneWay}" />
+
+                    <StackPanel Spacing="4"
+                                Visibility="{x:Bind ViewModel.ItSectionVisibility, Mode=OneWay}">
+                        <TextBlock Text="IT" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                        <Grid ColumnSpacing="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="SID:" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{x:Bind ViewModel.SelectedUser.Sid, Mode=OneWay}"
+                                       FontFamily="Consolas"
+                                       FontSize="11"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"
+                                       ToolTipService.ToolTip="{x:Bind ViewModel.SelectedUser.Sid, Mode=OneWay}" />
+                            <Button Grid.Column="2"
+                                    Command="{x:Bind ViewModel.CopyToClipboardCommand}"
+                                    CommandParameter="{x:Bind ViewModel.SelectedUser.Sid, Mode=OneWay}"
+                                    ToolTipService.ToolTip="Skopiuj SID"
+                                    Padding="6,4" MinWidth="0">
+                                <SymbolIcon Symbol="Copy" />
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- ── Pasek statusu ──────────────────────────────────────── -->
+        <TextBlock
+            Grid.Row="2"
+            Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
+            Style="{StaticResource CaptionTextBlockStyle}"
+            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+            Margin="0,2,0,0" />
+
+    </Grid>
+</Page>

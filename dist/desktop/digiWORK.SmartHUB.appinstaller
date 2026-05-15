@@ -10,6 +10,6 @@
       ProcessorArchitecture="x64"
       Uri="https://github.com/digiwork/digiWORK-SmartHUB/releases/download/v1.0.1/digiWORK.SmartHUB_1.0.1_x64.msix" />
   <UpdateSettings>
-    <OnLaunch HoursBetweenUpdateChecks="4" ShowPrompt="true" UpdateBlocksActivation="false" />
+    <OnLaunch HoursBetweenUpdateChecks="4" ShowPrompt="false" UpdateBlocksActivation="false" />
   </UpdateSettings>
 </AppInstaller>

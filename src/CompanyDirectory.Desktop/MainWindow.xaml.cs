@@ -239,7 +239,8 @@ public sealed partial class MainWindow : Window
     private void SetupWindow()
     {
         var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-        var scale = GetDpiForWindow(hWnd) / 96.0;
+        var rawDpi = GetDpiForWindow(hWnd);
+        var scale = rawDpi > 0 ? rawDpi / 96.0 : 1.0;
         var saved = _settingsService.LoadWindowBounds("Main");
 
         if (saved is { Width: > 0, Height: > 0 })

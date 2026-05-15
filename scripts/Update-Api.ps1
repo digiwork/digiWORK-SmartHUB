@@ -79,8 +79,11 @@ try {
     Copy-Item "$TempDir\extracted\CompanyDirectory.Api.exe" "$ApiDir\" -Force
     Write-Log "Executable replaced"
 
-    $json = Get-Content "$ApiDir\appsettings.json" -Raw
-    $json = $json -replace '"CurrentVersion"\s*:\s*"[^"]*"', ('"CurrentVersion": "' + $latestVersion + '"')
+    $q       = [char]34
+    $json    = Get-Content "$ApiDir\appsettings.json" -Raw
+    $pattern = $q + 'CurrentVersion' + $q + '\s*:\s*' + $q + '[^' + $q + ']*' + $q
+    $replace = $q + 'CurrentVersion' + $q + ': ' + $q + $latestVersion + $q
+    $json    = $json -replace $pattern, $replace
     Set-Content "$ApiDir\appsettings.json" $json -Encoding UTF8
     Write-Log "Version updated in appsettings.json"
 

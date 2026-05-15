@@ -80,7 +80,7 @@ try {
     Write-Log "Executable replaced"
 
     $json = Get-Content "$ApiDir\appsettings.json" -Raw
-    $json = $json -replace '"CurrentVersion"\s*:\s*"[^"]*"', "`"CurrentVersion`": `"$latestVersion`""
+    $json = $json -replace '"CurrentVersion"\s*:\s*"[^"]*"', ('"CurrentVersion": "' + $latestVersion + '"')
     Set-Content "$ApiDir\appsettings.json" $json -Encoding UTF8
     Write-Log "Version updated in appsettings.json"
 

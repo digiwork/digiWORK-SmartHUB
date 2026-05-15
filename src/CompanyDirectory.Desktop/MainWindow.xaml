@@ -16,6 +16,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Pasek powiadomień (aktualizacje, wiadomości wymagające potwierdzenia) -->
@@ -111,5 +112,32 @@
 
             <Frame x:Name="ContentFrame"/>
         </NavigationView>
+
+        <!-- Pasek statusu -->
+        <Border Grid.Row="2"
+                Padding="12,4"
+                BorderThickness="0,1,0,0"
+                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                Background="{ThemeResource LayerFillColorDefaultBrush}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Ellipse Width="8" Height="8"
+                             Fill="{x:Bind ViewModel.StatusDotBrush, Mode=OneWay}"
+                             VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Bind ViewModel.StatusSignalR, Mode=OneWay}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Grid.Column="1"
+                           Text="{x:Bind ViewModel.StatusVersion}"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

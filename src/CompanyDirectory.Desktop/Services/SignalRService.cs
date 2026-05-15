@@ -11,8 +11,9 @@ public class SignalRService : IAsyncDisposable
     private readonly HubConnection _connection;
     private readonly ILogger<SignalRService> _logger;
 
-    public event Action<MessageDto>?       MessageReceived;
-    public event Action<List<MessageDto>>? UnreadMessagesReceived;
+    public event Action<MessageDto>?         MessageReceived;
+    public event Action<List<MessageDto>>?   UnreadMessagesReceived;
+    public event Action<HubConnectionState>? StateChanged;
 
     public HubConnectionState State => _connection.State;
 
@@ -41,9 +42,24 @@ public class SignalRService : IAsyncDisposable
             UnreadMessagesReceived?.Invoke(msgs);
         });
 
+        _connection.Reconnecting += _ =>
+        {
+            _logger.LogWarning("SignalR reconnecting");
+            StateChanged?.Invoke(HubConnectionState.Reconnecting);
+            return Task.CompletedTask;
+        };
+
         _connection.Reconnected += _ =>
         {
             _logger.LogInformation("SignalR reconnected");
+            StateChanged?.Invoke(HubConnectionState.Connected);
+            return Task.CompletedTask;
+        };
+
+        _connection.Closed += _ =>
+        {
+            _logger.LogWarning("SignalR closed");
+            StateChanged?.Invoke(HubConnectionState.Disconnected);
             return Task.CompletedTask;
         };
     }
@@ -54,10 +70,12 @@ public class SignalRService : IAsyncDisposable
         {
             await _connection.StartAsync(ct);
             _logger.LogInformation("SignalR connected");
+            StateChanged?.Invoke(HubConnectionState.Connected);
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "SignalR failed to connect — automatic reconnect will retry");
+            StateChanged?.Invoke(HubConnectionState.Disconnected);
         }
     }
 

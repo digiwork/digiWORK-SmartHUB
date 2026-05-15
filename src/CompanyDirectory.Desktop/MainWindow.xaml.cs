@@ -2,10 +2,12 @@ using CompanyDirectory.Shared.Dtos;
 using CompanyDirectory_Desktop.Services;
 using CompanyDirectory_Desktop.ViewModels;
 using CompanyDirectory_Desktop.Views.Pages;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Windows.Graphics;
 using Windows.System;
@@ -69,11 +71,38 @@ public sealed partial class MainWindow : Window
         AppWindow.SetIcon("Assets/AppIcon.ico");
         SetupWindow();
 
+        ViewModel.StatusVersion = GetPackageVersion();
+        signalR.StateChanged += state => App.DispatcherQueue.TryEnqueue(() =>
+        {
+            ViewModel.StatusSignalRConnected = state == HubConnectionState.Connected;
+            ViewModel.StatusSignalR = state switch
+            {
+                HubConnectionState.Connected    => "Połączony",
+                HubConnectionState.Connecting   => "Łączenie…",
+                HubConnectionState.Reconnecting => "Ponowne łączenie…",
+                _                               => "Rozłączony",
+            };
+        });
+
         NavView.Loaded += (_, _) =>
         {
             if (NavView.MenuItems.OfType<NavigationViewItem>().FirstOrDefault() is { } first)
                 NavView.SelectedItem = first;
         };
+    }
+
+    private static string GetPackageVersion()
+    {
+        try
+        {
+            var v = Windows.ApplicationModel.Package.Current.Id.Version;
+            return $"v{v.Major}.{v.Minor}.{v.Build}";
+        }
+        catch
+        {
+            return Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) is { } ver
+                ? $"v{ver}" : string.Empty;
+        }
     }
 
     private void OnThemeChangeRequested(object? sender, ElementTheme theme)
@@ -227,7 +256,7 @@ public sealed partial class MainWindow : Window
             CenterWindow();
         }
 
-        AppWindow.Title = "CompanyDirectory";
+        AppWindow.Title = "digiWORK SmartHUB";
         AppWindow.Closing += OnAppWindowClosing;
     }
 

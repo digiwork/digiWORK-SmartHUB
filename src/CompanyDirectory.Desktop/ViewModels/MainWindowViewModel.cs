@@ -1,7 +1,9 @@
 using CompanyDirectory.Shared.Configuration;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Options;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 
 namespace CompanyDirectory_Desktop.ViewModels;
 
@@ -17,6 +19,20 @@ public partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     public partial bool IsDarkMode { get; set; }
+
+    [ObservableProperty]
+    public partial string StatusVersion { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string StatusSignalR { get; set; } = "Rozłączony";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StatusDotBrush))]
+    public partial bool StatusSignalRConnected { get; set; }
+
+    public SolidColorBrush StatusDotBrush => new(StatusSignalRConnected
+        ? Colors.SeaGreen
+        : Color.FromArgb(255, 138, 136, 134));
 
     public Visibility UnreadBadgeVisibility =>
         UnreadCount > 0 ? Visibility.Visible : Visibility.Collapsed;

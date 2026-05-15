@@ -9,8 +9,8 @@ param(
     [string]$DisplayName = "digiWORK SmartHUB API"
 )
 
-$ScriptDir  = $PSScriptRoot
-$ExePath    = Join-Path $ScriptDir "CompanyDirectory.Api.exe"
+$ScriptDir = $PSScriptRoot
+$ExePath   = Join-Path $ScriptDir "CompanyDirectory.Api.exe"
 
 Write-Host "=== Instalacja digiWORK SmartHUB API jako usluga ===" -ForegroundColor Cyan
 
@@ -27,8 +27,8 @@ New-Service -Name $ServiceName `
             -DisplayName $DisplayName `
             -BinaryPathName $ExePath `
             -StartupType Automatic `
-            -Description "digiWORK SmartHUB API — katalog pracowniczy" | Out-Null
+            -Description "digiWORK SmartHUB API - katalog pracowniczy" | Out-Null
 
 Start-Service -Name $ServiceName
 Write-Host "Usluga uruchomiona." -ForegroundColor Green
-Write-Host "URL API: http://localhost:5112  (skonfiguruj w appsettings.json Desktop)" -ForegroundColor Yellow
+Write-Host "URL API: http://localhost:5112" -ForegroundColor Yellow

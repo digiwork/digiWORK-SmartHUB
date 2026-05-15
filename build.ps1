@@ -252,11 +252,11 @@ New-Service -Name $ServiceName `
             -DisplayName $DisplayName `
             -BinaryPathName $ExePath `
             -StartupType Automatic `
-            -Description "digiWORK SmartHUB API — katalog pracowniczy" | Out-Null
+            -Description "digiWORK SmartHUB API - katalog pracowniczy" | Out-Null
 
 Start-Service -Name $ServiceName
 Write-Host "Usluga uruchomiona." -ForegroundColor Green
-Write-Host "URL API: http://localhost:5112  (skonfiguruj w appsettings.json Desktop)" -ForegroundColor Yellow
+Write-Host "URL API: http://localhost:5112" -ForegroundColor Yellow
 '@
 
 $ApiServiceScript | Set-Content (Join-Path $ApiDist "Install-ApiService.ps1") -Encoding UTF8

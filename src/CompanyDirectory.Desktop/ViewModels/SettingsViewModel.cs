@@ -81,12 +81,25 @@ public partial class SettingsViewModel : ObservableObject
         _ = LoadDiagnosticsAsync();
     }
 
+    private static string GetPackageVersion()
+    {
+        try
+        {
+            var v = Windows.ApplicationModel.Package.Current.Id.Version;
+            return $"{v.Major}.{v.Minor}.{v.Build}";
+        }
+        catch
+        {
+            return Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "—";
+        }
+    }
+
     [RelayCommand]
     private async Task RefreshDiagnosticsAsync() => await LoadDiagnosticsAsync();
 
     private async Task LoadDiagnosticsAsync()
     {
-        AppVersion    = Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "—";
+        AppVersion    = GetPackageVersion();
         DatabasePath  = _dbInit.DatabasePath;
         SignalRStatus = _signalR.State switch
         {

@@ -26,10 +26,6 @@ jobs:
         with:
           dotnet-version: '10.x'
 
-      - name: Install Windows workload
-        shell: pwsh
-        run: dotnet workload install windows
-
       - name: Restore certificate
         shell: pwsh
         run: |

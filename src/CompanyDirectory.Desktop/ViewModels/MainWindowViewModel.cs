@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
+using Windows.UI;
 
 namespace CompanyDirectory_Desktop.ViewModels;
 

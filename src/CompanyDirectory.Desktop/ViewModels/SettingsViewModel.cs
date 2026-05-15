@@ -122,6 +122,12 @@ public partial class SettingsViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void ReportIssue() =>
+        Process.Start(new ProcessStartInfo(
+            "https://github.com/digiwork/digiWORK-SmartHUB/issues/new/choose")
+            { UseShellExecute = true });
+
+    [RelayCommand]
     private void Save()
     {
         _autostart.SetEnabled(IsAutostartEnabled);

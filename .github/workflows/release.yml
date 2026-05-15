@@ -1,0 +1,151 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: ver
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"        # v1.2.3
+          $v   = $tag.TrimStart('v')              # 1.2.3
+          echo "VER=$v"       >> $env:GITHUB_OUTPUT
+          echo "VER_MSIX=$v.0" >> $env:GITHUB_OUTPUT
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Install Windows workload
+        shell: pwsh
+        run: dotnet workload install windows
+
+      - name: Restore certificate
+        shell: pwsh
+        run: |
+          $bytes = [Convert]::FromBase64String("${{ secrets.CERTIFICATE_PFX }}")
+          [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\cert.pfx", $bytes)
+
+      - name: Bump Package.appxmanifest version
+        shell: pwsh
+        run: |
+          $f = "src/CompanyDirectory.Desktop/Package.appxmanifest"
+          (Get-Content $f -Raw) `
+            -replace '(?<=<Identity[^>]*Version=")[^"]*', '${{ steps.ver.outputs.VER_MSIX }}' |
+          Set-Content $f -Encoding utf8
+
+      - name: Update API appsettings versions
+        shell: pwsh
+        run: |
+          $f    = "src/CompanyDirectory.Api/appsettings.json"
+          $json = Get-Content $f -Raw | ConvertFrom-Json -Depth 10
+          $json.Updates.CurrentVersion = "${{ steps.ver.outputs.VER }}"
+          $json.Updates.DownloadUrl    = "https://github.com/${{ github.repository }}/releases/latest/download/digiWORK.SmartHUB.appinstaller"
+          $json | ConvertTo-Json -Depth 10 | Set-Content $f -Encoding utf8
+
+      - name: Build Desktop MSIX
+        shell: pwsh
+        run: |
+          $out = (Resolve-Path "dist/desktop" -ErrorAction SilentlyContinue)
+          if (-not $out) { $out = New-Item -ItemType Directory -Path "dist/desktop" -Force }
+          dotnet build src/CompanyDirectory.Desktop/CompanyDirectory.Desktop.csproj `
+            --configuration Release `
+            -p:Platform=x64 `
+            -p:RuntimeIdentifier=win-x64 `
+            -p:AppxPackageSigningEnabled=false `
+            "-p:AppxPackageDir=$((Resolve-Path 'dist/desktop').Path)\" `
+            -p:GenerateAppxPackageOnBuild=true
+
+      - name: Sign and rename MSIX
+        id: msix
+        shell: pwsh
+        run: |
+          $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" `
+            -Filter signtool.exe -Recurse |
+            Where-Object { $_.FullName -match '\\x64\\' } |
+            Sort-Object FullName -Descending |
+            Select-Object -First 1
+
+          $msix = Get-ChildItem dist/desktop -Filter *.msix -Recurse | Select-Object -First 1
+          & $signtool.FullName sign /fd SHA256 /f "$env:RUNNER_TEMP\cert.pfx" `
+            /p "${{ secrets.CERTIFICATE_PASSWORD }}" $msix.FullName
+          if ($LASTEXITCODE -ne 0) { throw "signtool failed" }
+
+          $dest = "dist/desktop/digiWORK.SmartHUB_${{ steps.ver.outputs.VER }}_x64.msix"
+          Move-Item $msix.FullName $dest -Force
+          echo "PATH=$dest" >> $env:GITHUB_OUTPUT
+
+      - name: Export .cer
+        shell: pwsh
+        run: |
+          $pfx  = [IO.File]::ReadAllBytes("$env:RUNNER_TEMP\cert.pfx")
+          $cert = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new(
+                    $pfx, "${{ secrets.CERTIFICATE_PASSWORD }}")
+          $cer  = $cert.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert)
+          [IO.File]::WriteAllBytes("dist/desktop/CompanyDirectory.cer", $cer)
+
+      - name: Generate .appinstaller
+        shell: pwsh
+        run: |
+          $v       = "${{ steps.ver.outputs.VER_MSIX }}"
+          $baseUrl = "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}"
+          $selfUrl = "https://github.com/${{ github.repository }}/releases/latest/download/digiWORK.SmartHUB.appinstaller"
+
+          @"
+<?xml version="1.0" encoding="utf-8"?>
+<AppInstaller
+    Uri="$selfUrl"
+    Version="$v"
+    xmlns="http://schemas.microsoft.com/appx/appinstaller/2018">
+  <MainPackage
+      Name="B5636A49-99A7-463E-A93B-CC92F074F3BF"
+      Version="$v"
+      Publisher="CN=AppPublisher"
+      ProcessorArchitecture="x64"
+      Uri="$baseUrl/digiWORK.SmartHUB_${{ steps.ver.outputs.VER }}_x64.msix" />
+  <UpdateSettings>
+    <OnLaunch HoursBetweenUpdateChecks="4" ShowPrompt="true" UpdateBlocksActivation="false" />
+  </UpdateSettings>
+</AppInstaller>
+"@ | Set-Content "dist/desktop/digiWORK.SmartHUB.appinstaller" -Encoding utf8
+
+      - name: Publish API
+        shell: pwsh
+        run: |
+          dotnet publish src/CompanyDirectory.Api/CompanyDirectory.Api.csproj `
+            --configuration Release `
+            --runtime win-x64 `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            --output dist/api
+
+      - name: Package API zip
+        shell: pwsh
+        run: |
+          Compress-Archive `
+            -Path dist/api/CompanyDirectory.Api.exe, dist/api/Install-ApiService.ps1, dist/api/start.bat `
+            -DestinationPath "dist/digiWORK.SmartHUB.Api_${{ steps.ver.outputs.VER }}.zip" `
+            -Force
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "digiWORK SmartHUB v${{ steps.ver.outputs.VER }}"
+          generate_release_notes: true
+          files: |
+            dist/desktop/digiWORK.SmartHUB_${{ steps.ver.outputs.VER }}_x64.msix
+            dist/desktop/digiWORK.SmartHUB.appinstaller
+            dist/desktop/CompanyDirectory.cer
+            dist/desktop/Install-Desktop.ps1
+            dist/digiWORK.SmartHUB.Api_${{ steps.ver.outputs.VER }}.zip

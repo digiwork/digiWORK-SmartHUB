@@ -28,12 +28,11 @@ public sealed class UserSettingsService
         string apiBaseUrl)
     {
         var json = ReadJson();
-        json["Ui"] = new JsonObject
-        {
-            ["StartMinimizedToTray"] = startMinimizedToTray,
-            ["CloseToTray"]          = closeToTray,
-            ["ShowEmployeeCard"]     = showEmployeeCard,
-        };
+        var ui   = json["Ui"] as JsonObject ?? new JsonObject();
+        ui["StartMinimizedToTray"] = startMinimizedToTray;
+        ui["CloseToTray"]          = closeToTray;
+        ui["ShowEmployeeCard"]     = showEmployeeCard;
+        json["Ui"] = ui;
         json["Hotkey"] = new JsonObject
         {
             ["Modifiers"] = hotkeyModifiers,

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppInstaller
+    Uri="https://github.com/digiwork/digiWORK-SmartHUB/releases/latest/download/digiWORK.SmartHUB.appinstaller"
+    Version="1.0.0.1"
+    xmlns="http://schemas.microsoft.com/appx/appinstaller/2018">
+  <MainPackage
+      Name="B5636A49-99A7-463E-A93B-CC92F074F3BF"
+      Version="1.0.0.1"
+      Publisher="CN=AppPublisher"
+      ProcessorArchitecture="x64"
+      Uri="https://github.com/digiwork/digiWORK-SmartHUB/releases/download/v1.0.1/digiWORK.SmartHUB_1.0.1_x64.msix" />
+  <UpdateSettings>
+    <OnLaunch HoursBetweenUpdateChecks="4" ShowPrompt="true" UpdateBlocksActivation="false" />
+  </UpdateSettings>
+</AppInstaller>

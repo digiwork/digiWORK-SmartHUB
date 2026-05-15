@@ -489,3 +489,4 @@ dist/api/*.json
 dist/api/Data/
 dist/api/Logs/
 dist/desktop/CompanyDirectory.Desktop_*/
+dist/installer/*.exe

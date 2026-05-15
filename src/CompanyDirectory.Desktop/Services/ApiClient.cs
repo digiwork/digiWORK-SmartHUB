@@ -9,21 +9,28 @@ namespace CompanyDirectory_Desktop.Services;
 public sealed class ApiClient : IApiClient, IDisposable
 {
     private readonly HttpClient _http;
+    private readonly HttpClient _anonHttp;
     private readonly ILogger<ApiClient> _logger;
 
     public ApiClient(IOptions<ApiClientSettings> options, AuthService auth, ILogger<ApiClient> logger)
     {
         _logger = logger;
 
-        var baseUrl = options.Value.BaseUrl.TrimEnd('/');
+        var baseAddress = new Uri(options.Value.BaseUrl.TrimEnd('/') + "/");
 
         _http = new HttpClient(new AuthHandler(auth))
         {
-            BaseAddress = new Uri(baseUrl + "/"),
+            BaseAddress = baseAddress,
             Timeout = TimeSpan.FromSeconds(30),
         };
-
         _http.DefaultRequestHeaders.Add("Accept", "application/json");
+
+        _anonHttp = new HttpClient
+        {
+            BaseAddress = baseAddress,
+            Timeout = TimeSpan.FromSeconds(10),
+        };
+        _anonHttp.DefaultRequestHeaders.Add("Accept", "application/json");
     }
 
     public async Task<List<UserDirectoryEntryDto>> GetAllUsersAsync(CancellationToken ct = default)
@@ -57,7 +64,7 @@ public sealed class ApiClient : IApiClient, IDisposable
     {
         try
         {
-            var response = await _http.GetAsync("api/health", ct);
+            var response = await _anonHttp.GetAsync("api/health", ct);
             return response.IsSuccessStatusCode;
         }
         catch
@@ -70,7 +77,7 @@ public sealed class ApiClient : IApiClient, IDisposable
     {
         try
         {
-            return await _http.GetFromJsonAsync<VersionInfoDto>("api/version", ct);
+            return await _anonHttp.GetFromJsonAsync<VersionInfoDto>("api/version", ct);
         }
         catch (Exception ex)
         {
@@ -130,5 +137,9 @@ public sealed class ApiClient : IApiClient, IDisposable
         }
     }
 
-    public void Dispose() => _http.Dispose();
+    public void Dispose()
+    {
+        _http.Dispose();
+        _anonHttp.Dispose();
+    }
 }
